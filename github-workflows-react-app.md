@@ -1,31 +1,36 @@
-# TASK 5: GitHub Workflows for React App
+# TASK 5:GitHub Actions – React App CI/CD Pipeline
 
 ## 1. Objective
 
-The objective of this task was to implement a Continuous Integration (CI) workflow for a React application using GitHub Actions.
+The objective of this task was to create a React application using Vite and implement Continuous Integration (CI) and Continuous Deployment (CD) using GitHub Actions.
 
-The workflow automatically checks the React application whenever code is pushed to the `main` branch or a Pull Request is created targeting the `main` branch.
+The pipeline automatically:
+- Installs project dependencies.
+- Checks code quality using ESLint.
+- Builds the React application.
+- Deploys the production build to GitHub Pages.
 
 ## 2. Technologies Used
 
 - React.js
+- JavaScript
 - Vite
-- Node.js
+- Node.js 24
 - npm
-- Git
-- GitHub
+- Git and GitHub
 - GitHub Actions
-- ESLint
+- GitHub Pages
+- YAML
 
-## 3. Project Setup
+## 3. React Project Setup
 
-Created a React application using Vite.
+Created the React application using Vite:
 
 ```bash
 npm create vite@latest react-github-actions -- --template react
 ```
 
-Installed project dependencies:
+Installed dependencies:
 
 ```bash
 npm install
@@ -39,161 +44,129 @@ npm run dev
 
 ## 4. Git and GitHub Setup
 
-Initialized Git in the project:
+Initialized the Git repository and pushed the project to GitHub.
 
 ```bash
 git init
-```
-
-Added project files:
-
-```bash
 git add .
-```
-
-Created the initial commit:
-
-```bash
 git commit -m "Initial React project setup"
-```
-
-Renamed the default branch to main:
-
-```bash
 git branch -M main
-```
-
-Connected the GitHub repository:
-
-```bash
-git remote add origin https://github.com/ishikarathod26/react-github-actions.git
-```
-
-Pushed the project to GitHub:
-
-```bash
+git remote add origin <repository-url>
 git push -u origin main
 ```
 
-## 5. GitHub Actions Workflow Configuration
+## 5. Continuous Integration (CI)
 
-Created the following directory structure:
+Created the workflow file:
 
-```text
-.github/
-   workflows/
-      ci.yml
+`.github/workflows/ci.yml`
+
+The CI workflow is triggered on:
+- Push to the main branch.
+- Pull requests targeting the main branch.
+- Manual execution using workflow_dispatch.
+
+### CI Workflow Responsibilities
+
+1. Checkout repository code.
+2. Set up Node.js.
+3. Install dependencies using `npm ci`.
+4. Run ESLint using `npm run lint`.
+5. Build the React application using `npm run build`.
+
+### Important Commands
+
+- `npm ci`: Installs dependencies from the lock file.
+- `npm run lint`: Checks code for configured linting issues.
+- `npm run build`: Generates the production build inside the `dist` directory.
+
+## 6. Continuous Deployment (CD)
+
+Implemented automatic deployment using GitHub Pages.
+
+Created a separate workflow:
+
+`.github/workflows/deploy.yml`
+
+The deployment workflow is triggered whenever code is pushed to the main branch. It also supports manual execution.
+
+### Deployment Process
+
+1. Checkout repository code.
+2. Set up Node.js.
+3. Install dependencies using `npm ci`.
+4. Generate the production build using `npm run build`.
+5. Upload the `dist` directory as a GitHub Pages artifact.
+6. Deploy the artifact using GitHub Pages.
+
+### Important GitHub Actions
+
+- `actions/checkout`: Checks out the repository.
+- `actions/setup-node`: Configures Node.js.
+- `actions/upload-pages-artifact`: Uploads the production build for deployment.
+- `actions/deploy-pages`: Publishes the uploaded artifact to GitHub Pages.
+
+## 7. Vite Configuration for GitHub Pages
+
+Updated `vite.config.js` with the repository base path:
+
+```javascript
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/react-github-actions/',
+})
 ```
 
-Configured the workflow in `ci.yml`:
+The `base` property ensures that JavaScript, CSS and other assets are loaded correctly when the application is hosted under a repository-specific URL.
 
-```yaml
-name: React App CI
+## 8. GitHub Pages Configuration
 
-on:
-  push:
-    branches:
-      - main
+Configured GitHub Pages in repository settings:
 
-  pull_request:
-    branches:
-      - main
+**Settings → Pages → Build and deployment → Source → GitHub Actions**
 
-  workflow_dispatch:
+This allows GitHub Actions to publish the application.
 
-permissions:
-  contents: read
+## 9. Testing and Verification
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+Pushed the updated configuration and deployment workflow to the main branch.
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+Verified:
+- CI workflow execution.
+- Production build completion.
+- CD workflow execution.
+- GitHub Pages deployment.
+- Live React application accessibility.
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
+## 10. Project Links
 
-      - name: Install dependencies
-        run: npm ci
+**GitHub Repository:**
 
-      - name: Run ESLint
-        run: npm run lint
+https://github.com/ishikarathod26/react-github-actions
 
-      - name: Build React application
-        run: npm run build
-```
+**GitHub Actions:**
 
-## 6. Workflow Explanation
+https://github.com/ishikarathod26/react-github-actions/actions
 
-### Triggers
+**Live Application:**
 
-- **Push:** Runs the workflow when code is pushed to the main branch.
-- **Pull Request:** Runs the workflow when a Pull Request targets the main branch.
-- **Workflow Dispatch:** Allows manual execution of the workflow.
+https://ishikarathod26.github.io/react-github-actions/
 
-### Job Configuration
+## 11. Expected Outcome
 
-- **runs-on:** Uses an Ubuntu GitHub-hosted runner.
-- **Checkout:** Downloads the repository code into the runner.
-- **Setup Node.js:** Configures Node.js version 24.
-- **npm ci:** Installs dependencies using the package-lock.json file.
-- **ESLint:** Checks the source code for configured linting issues.
-- **Build:** Creates the production build of the React application.
+The project demonstrates an automated CI/CD pipeline using GitHub Actions.
 
-## 7. Testing the CI Workflow
+Whenever new code is pushed to the main branch:
+- CI performs linting and build validation.
+- CD independently builds and deploys the application to GitHub Pages.
 
-After configuring the workflow, modified the React application UI and updated its CSS styling.
+This reduces manual deployment effort and makes the application accessible online.
 
-Checked the application locally using:
+## 12. Conclusion
 
-```bash
-npm run dev
-```
+Successfully implemented Continuous Integration and Continuous Deployment for a React application using GitHub Actions and GitHub Pages.
 
-Verified the changes in the browser.
-
-Then staged and committed the updated files:
-
-```bash
-git add .
-git commit -m "Improve React portfolio UI"
-```
-
-Pushed the changes to GitHub:
-
-```bash
-git push
-```
-
-The push to the main branch triggers the GitHub Actions CI workflow automatically.
-
-## 8. GitHub Repository
-
-Repository: https://github.com/ishikarathod26/react-github-actions
-
-GitHub Actions: https://github.com/ishikarathod26/react-github-actions/actions
-
-## 9. Expected Outcome
-
-The CI workflow automates the following checks:
-
-1. Repository checkout.
-2. Node.js environment setup.
-3. Dependency installation.
-4. ESLint validation.
-5. React production build.
-
-This helps identify code quality issues and build errors before changes are merged or deployed.
-
-## 10. Conclusion
-
-Successfully implemented a GitHub Actions Continuous Integration workflow for a React application.
-
-The workflow is configured to run automatically on pushes and Pull Requests targeting the main branch, along with manual execution support.
-
-This task provided practical experience with Git, GitHub, React, CI pipelines, YAML configuration, and GitHub Actions.
+This task provided practical experience with Git, GitHub, YAML workflow configuration, automated build validation and deployment.
